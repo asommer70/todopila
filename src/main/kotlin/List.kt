@@ -1,1 +1,0 @@
-class List(val id: Int, var name: String, var userId: Int, val createdAt: Int)

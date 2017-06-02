@@ -1,6 +1,9 @@
-
 package todopila
+
+import ninja.sakib.pultusorm.core.PultusORM
+
 val version = "0.0.1"
+
 
 fun main(args: Array<String>) {	
 	//
@@ -14,7 +17,7 @@ fun main(args: Array<String>) {
 			"-v" -> printVersion()
 			else -> {
 				// TODO:as set active List as arg[1]...
-				print("List set to:  " + args[0])
+				println("List set to:  " + args[0])
 		    }
 		}	
 	}
@@ -23,6 +26,31 @@ fun main(args: Array<String>) {
 	println("press h for a list of commands.")
 	
 	// TODO:as Display a list of Lists.
+//	val obj = parse("/object.json") as JsonObject
+	//val pultusORM: PultusORM = PultusORM("~/.todopila/db/todopila.db")
+	val pultusORM: PultusORM = PultusORM("todopila.db", "/Users/adam/.todopila/db/")
+	
+//	val daily: TodoList = TodoList()
+//	daily.name = "Daily"
+//	daily.userId = 0
+//	daily.createdAt = System.currentTimeMillis() / 1000
+//	pultusORM.save(daily)
+//	val pila: TodoList = TodoList()
+//	pila.name = "ToDo Pila"
+//	pila.userId = 0
+//	pila.createdAt = System.currentTimeMillis() / 1000
+//	pultusORM.save(pila)
+//	pultusORM.close()
+//	
+	val todoLists = pultusORM.find(TodoList())
+	for (it in todoLists) {
+	    val todoList = it as TodoList
+	    println(todoList.id)
+	    println(todoList.name)
+	    println(todoList.userId)
+	    println(todoList.createdAt)
+	    println()
+	}
 	
 	println("Hello World")
 //	var input = readLine()
@@ -42,3 +70,10 @@ fun printVersion() {
 	println("Todo Pila! version: " + version)
 	System.exit(0)
 }
+
+//fun parse(name: String) : Any {
+//    val cls = Parser::class.java
+//    cls.getResourceAsStream(name)?.let { inputStream ->
+//        return Parser().parse(inputStream)
+//    }
+//}

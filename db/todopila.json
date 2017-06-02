@@ -1,0 +1,15 @@
+[
+	{
+		"id": 1
+		"name": "Daily",
+		"createdAt": 1496208179972,
+		"userId": 1,
+		"items": [
+			"content": "Come up with 10 ideas.",
+			"status": 0,
+			"listId": 1,
+			"createdAt": 1496208289239,
+			"updatedAt": 1496208289239
+		]
+	}
+]
