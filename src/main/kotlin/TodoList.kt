@@ -8,9 +8,9 @@ import ninja.sakib.pultusorm.annotations.PrimaryKey
 class TodoList {
     @PrimaryKey
     @AutoIncrement
-    var id: Int = 0
-    var name: String? = null
-    var userId: Int? = null
-    var createdAt: Long? = null
+    var listId: Int = 0
+    var name = ""
+    var userId = ""
+    var createdAt = ""
 }
 

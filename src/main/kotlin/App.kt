@@ -32,20 +32,20 @@ fun main(args: Array<String>) {
 	
 //	val daily: TodoList = TodoList()
 //	daily.name = "Daily"
-//	daily.userId = 0
-//	daily.createdAt = System.currentTimeMillis() / 1000
+//	daily.userId = "0"
+//	daily.createdAt = (System.currentTimeMillis() / 1000).toString()
 //	pultusORM.save(daily)
 //	val pila: TodoList = TodoList()
 //	pila.name = "ToDo Pila"
-//	pila.userId = 0
-//	pila.createdAt = System.currentTimeMillis() / 1000
+//	pila.userId = "0"
+//	pila.createdAt = (System.currentTimeMillis() / 1000).toString()
 //	pultusORM.save(pila)
 //	pultusORM.close()
 //	
 	val todoLists = pultusORM.find(TodoList())
 	for (it in todoLists) {
 	    val todoList = it as TodoList
-	    println(todoList.id)
+	    println(todoList.listId)
 	    println(todoList.name)
 	    println(todoList.userId)
 	    println(todoList.createdAt)
