@@ -31,7 +31,6 @@ allprojects {
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   compile 'ninja.sakib:PultusORM:v1.4'
-  compile 'org.fusesource.jansi:jansi:1.16'
   testCompile 'junit:junit:4.11'
   testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }
