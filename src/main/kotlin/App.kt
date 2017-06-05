@@ -31,10 +31,18 @@ fun main(args: Array<String>) {
 	println()
 	
 	// TODO:as Display a list of Lists.
-	getLists()
+//	getLists()
 	
-	
-//	var input = readLine()
+	var q = false
+	while (q != true) {
+		var input = readLine()
+	 	when (input) {
+			"h" -> printCommands()
+			"L" -> getLists()
+			"q" -> q = true
+	 	}  
+	}
+
 //	println("You said: " + input)
 	println()
 }
@@ -50,6 +58,22 @@ fun printHelp() {
 fun printVersion() {
 	println("Todo Pila! version: " + version)
 	System.exit(0)
+}
+
+fun printCommands() {
+	println("ToDo List Actions:")
+	println("\tL to list ToDo Lists.")
+	println("\tL[\$NUMBER] to select a ToDo List.")
+	println ("\tA to add an Item to the selected ToDo List.")
+	println()
+	
+	println("Item Actions:")
+	println("\tl to list Items in the selected ToDo List.")
+	println("\tl[\$NUMBER] to select an Item.")
+	println("\t+ to mark Item as done.")
+	println("\t- to mark Item as not done.")
+	println("\tD to delete Item.")
+	println()
 }
 
 fun createList() {
