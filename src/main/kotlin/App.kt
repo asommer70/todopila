@@ -1,6 +1,7 @@
 package todopila
 
 import ninja.sakib.pultusorm.core.PultusORM
+import kotlin.text.regex
 
 val version = "0.0.1"
 val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.todopila/db")
@@ -30,15 +31,15 @@ fun main(args: Array<String>) {
 	println("press h for a list of commands.")
 	println()
 	
-	// TODO:as Display a list of Lists.
-//	getLists()
-	
+	val todolist = TodoList()
+	val selectListCheck = Regex("L\\d")
 	var q = false
 	while (q != true) {
-		var input = readLine()
+		var input: String? = readLine()
 	 	when (input) {
 			"h" -> printCommands()
-			"L" -> getLists()
+			"L" -> todolist.getLists()
+//			selectListCheck.matches(input) -> todolist.selectList(input)
 			"q" -> q = true
 	 	}  
 	}
@@ -76,32 +77,6 @@ fun printCommands() {
 	println()
 }
 
-fun createList() {
-	//	val daily: TodoList = TodoList()
-//	daily.name = "Daily"
-//	daily.userId = "0"
-//	daily.createdAt = (System.currentTimeMillis() / 1000).toString()
-//	pultusORM.save(daily)
-//	val pila: TodoList = TodoList()
-//	pila.name = "ToDo Pila"
-//	pila.userId = "0"
-//	pila.createdAt = (System.currentTimeMillis() / 1000).toString()
-//	pultusORM.save(pila)
-//	pultusORM.close()
-}
-
-fun getLists() {
-	println("ToDo Lists:")
-	
-	val todoLists = pultusORM.find(TodoList())
-	for ((idx, it) in todoLists.withIndex()) {
-	    val todoList = it as TodoList
-		println("\t[$idx] ${todoList.name}");
-//	    println(ansi().fg(GREEN).a("\t[$idx] ${todoList.name}").reset())
-//		println("$GREEN\t[$idx] $MAGENTA${todoList.name}$RESET")
-	}
-    println()
-}
 
 //fun parse(name: String) : Any {
 //    val cls = Parser::class.java
