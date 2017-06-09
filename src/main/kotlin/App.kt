@@ -4,9 +4,7 @@ import ninja.sakib.pultusorm.core.PultusORM
 import ninja.sakib.pultusorm.core.PultusORMUpdater
 import ninja.sakib.pultusorm.core.PultusORMCondition
 import ninja.sakib.pultusorm.core.PultusORMQuery
-import java.lang.System
-import java.io.InputStream
-import java.io.ByteArrayInputStream
+import org.joda.time.DateTime
 
 val version = "0.0.1"
 val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.todopila/db")
@@ -94,7 +92,7 @@ fun main(args: Array<String>) {
 		{
 			var item = listItems[input.removeRange(0, 1).toInt()] as Item
 			
-			var updateValue: Any = 1
+			var updateValue: Any = ""
 			var updateField = "status"
 
 			if (input.first().toString() == "-") updateValue = 0
@@ -181,7 +179,9 @@ fun printItems() {
 	    val item = it as Item
 		var done = " "
 		if (item.status) done = "\u2713"
-	    println("\t${idx}. [$done] ${item.content}")
+		var createdAt = DateTime(item.createdAt.toLong() * 1000L);
+		val created = "${createdAt.monthOfYear().getAsText()} ${createdAt.getDayOfMonth()}, ${createdAt.getYear()}"
+	    println("\t${idx} ($created) [$done]\t${item.content}")
 	}
 	println()
 	getPrompt()
