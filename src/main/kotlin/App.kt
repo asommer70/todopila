@@ -1,7 +1,12 @@
 package todopila
 
 import ninja.sakib.pultusorm.core.PultusORM
-import kotlin.text.regex
+import ninja.sakib.pultusorm.core.PultusORMUpdater
+import ninja.sakib.pultusorm.core.PultusORMCondition
+import ninja.sakib.pultusorm.core.PultusORMQuery
+import java.lang.System
+import java.io.InputStream
+import java.io.ByteArrayInputStream
 
 val version = "0.0.1"
 val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.todopila/db")
@@ -9,6 +14,14 @@ val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.t
 val GREEN = "\u001B[32m"
 val MAGENTA = "\u001B[35m"
 val RESET = "\u001B[0m"
+
+var selectedList: TodoList? = null
+var listItems: MutableList<Any> = mutableListOf<Any>()
+val selectListCheck = Regex("""L\d""")
+val markDoneCheck = Regex("""\+\d""")
+val markNotDoneCheck = Regex("""\-\d""")
+val archiveItemCheck = Regex("""D\d""")
+val editItemCheck = Regex("""e\d""")
 
 fun main(args: Array<String>) {	
 	//
@@ -27,25 +40,99 @@ fun main(args: Array<String>) {
 		}	
 	}
 			
+	// Print welcome message.
 	println("Welcome to ToDo Pila!")
-	println("press h for a list of commands.")
+	println("press h, or ?, for a list of commands.")
 	println()
+	getPrompt()
 	
+	// Setup variables.
 	val todolist = TodoList()
-	val selectListCheck = Regex("L\\d")
+	todolist.loadLists()
 	var q = false
+	
+	// Main loop.
 	while (q != true) {
-		var input: String? = readLine()
-	 	when (input) {
-			"h" -> printCommands()
-			"L" -> todolist.getLists()
-//			selectListCheck.matches(input) -> todolist.selectList(input)
-			"q" -> q = true
-	 	}  
+		var input: String = readLine().toString()
+
+		if (input.isEmpty()) { 	getPrompt() }
+		else if (input == "q") { q = true }
+			
+		else if (input == "h" || input == "?") { printCommands() }
+			
+		else if (input == "L") { todolist.getLists() }
+			
+		else if (selectListCheck.containsMatchIn(input)) {
+			selectedList = todolist.selectList(input.removeRange(0, 1).toInt())
+			listItems = todolist.getItems(selectedList!!.listId.toString())
+			println("Selected List: ${selectedList!!.name}")
+			getPrompt()
+		}
+		
+		else if (input == "a") {
+			println("Add Item to ${selectedList!!.name}:")
+			var itemInput: String = readLine().toString()
+			Item().create(itemInput, selectedList!!.listId.toString())
+			
+			println("Items in ${selectedList!!.name}:")
+			listItems = todolist.getItems(selectedList!!.listId.toString())
+			printItems()		}
+			
+	    else if (input == "l") {
+			if (selectedList != null) {
+				println("Items in ${selectedList!!.name}:")
+				listItems = todolist.getItems(selectedList!!.listId.toString())
+				printItems()
+			} else { println("Please select a ToDo List first.") }
+			
+		}
+			
+		else if (markDoneCheck.containsMatchIn(input) ||
+				markNotDoneCheck.containsMatchIn(input) ||
+				archiveItemCheck.containsMatchIn(input) ||
+				editItemCheck.containsMatchIn(input))
+		{
+			var item = listItems[input.removeRange(0, 1).toInt()] as Item
+			
+			var updateValue: Any = 1
+			var updateField = "status"
+
+			if (input.first().toString() == "-") updateValue = 0
+			
+			else if (archiveItemCheck.containsMatchIn(input)) updateField = "archive"
+			
+			else if (editItemCheck.containsMatchIn(input)) {
+				updateField = "content"
+				
+				println("Old Item: ${item.content}")
+				updateValue = readLine().toString()
+				if (updateValue == "") updateValue = item.content
+			}
+			
+			val condition: PultusORMCondition = PultusORMCondition.Builder()
+			            .eq("itemId", item.itemId)
+			            .eq("updatedAt", (System.currentTimeMillis() / 1000).toString())
+			            .build()
+			
+			val updater: PultusORMUpdater = PultusORMUpdater.Builder()
+			            .set(updateField, updateValue)
+			            .condition(condition)   // condition is optional
+			            .build()
+			
+			pultusORM.update(Item(), updater)
+			
+			println("Items in ${selectedList!!.name}:")
+			listItems = todolist.getItems(selectedList!!.listId.toString())
+			printItems()
+		}
+			
+		else {
+			println("Sorry, I don't recognize that command.")
+			getPrompt()
+		 }
 	}
 
-//	println("You said: " + input)
-	println()
+	println("ToDo Pila! salutes you! And good bye...")
 }
 
 fun printHelp() {
@@ -64,23 +151,38 @@ fun printVersion() {
 fun printCommands() {
 	println("ToDo List Actions:")
 	println("\tL to list ToDo Lists.")
+	println("\tA to add a new ToDo List.")
 	println("\tL[\$NUMBER] to select a ToDo List.")
-	println ("\tA to add an Item to the selected ToDo List.")
+	println ("\ta to add an Item to the selected ToDo List.")
+	println("\tE[\$NUMBER] to edit the selected ToDo List.")
+    println("\tDD to archive the selected ToDo List.")
 	println()
 	
 	println("Item Actions:")
 	println("\tl to list Items in the selected ToDo List.")
-	println("\tl[\$NUMBER] to select an Item.")
-	println("\t+ to mark Item as done.")
-	println("\t- to mark Item as not done.")
-	println("\tD to delete Item.")
+	println("\te[\$NUMBER] to edit an Item.")
+	println("\t+[\$NUMBER] to mark Item as done.")
+	println("\t-[\$NUMBER] to mark Item as not done.")
+	println("\tD[\$NUMBER] to archive Item.")
 	println()
+	getPrompt()
 }
 
+fun getPrompt() {
+	if (selectedList != null) {
+		print("todopila -> ${selectedList!!.name}> ")
+	} else {
+		print("todopila> ")
+	}
+}
 
-//fun parse(name: String) : Any {
-//    val cls = Parser::class.java
-//    cls.getResourceAsStream(name)?.let { inputStream ->
-//        return Parser().parse(inputStream)
-//    }
-//}
+fun printItems() {
+	for ((idx, it) in listItems.withIndex()) {
+	    val item = it as Item
+		var done = " "
+		if (item.status) done = "\u2713"
+	    println("\t${idx}. [$done] ${item.content}")
+	}
+	println()
+	getPrompt()
+}

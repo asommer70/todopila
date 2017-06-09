@@ -3,6 +3,8 @@ import ninja.sakib.pultusorm.core.PultusORM
 import ninja.sakib.pultusorm.annotations.AutoIncrement
 import ninja.sakib.pultusorm.annotations.Ignore
 import ninja.sakib.pultusorm.annotations.PrimaryKey
+import ninja.sakib.pultusorm.core.PultusORMCondition
+import ninja.sakib.pultusorm.core.PultusORMQuery
 
 class TodoList {
     @PrimaryKey
@@ -12,14 +14,17 @@ class TodoList {
     var userId = ""
 	var archive = false
     var createdAt = ""
+	
 	@Ignore
     var all = mutableListOf<Any>()
+	@Ignore
 	public var selected: Any? = null
+	
+	fun loadLists() { this.all = pultusORM.find(TodoList()) }
 	
     fun getLists() {
 		println("ToDo Lists:")
 		
-		this.all = pultusORM.find(TodoList())
 		for ((idx, it) in this.all.withIndex()) {
 		    val todoList = it as TodoList
 			println("\t[$idx] ${todoList.name}");
@@ -27,6 +32,7 @@ class TodoList {
 	//		println("$GREEN\t[$idx] $MAGENTA${todoList.name}$RESET")
 		}
 	    println()
+	    getPrompt()
 	}
 	
 	fun createList() {
@@ -43,9 +49,24 @@ class TodoList {
 		//	pultusORM.close()
 	}
 	
-	fun selectList(idx: Int): Any {
-		this.selected = this.all[idx]
-		return this.selected!!
+	fun selectList(idx: Int): TodoList {
+//		this.selected = this.all[idx]
+//		this.selected = this.all[idx] as TodoList
+//		val name = this.selected
+//		val name = this.all[idx].name
+//		println("Selected ${this.selected.name}.")
+		return this.all[idx] as TodoList
+	}
+	
+	fun getItems(listId: String): MutableList<Any> {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+            .eq("listId", listId)
+            .and()
+			.eq("archive", 0)
+            .sort("createdAt", PultusORMQuery.Sort.ASCENDING)
+            .build()
+		
+		return pultusORM.find(Item(), condition)
 	}
 }
 
