@@ -83,6 +83,30 @@ fun main(args: Array<String>) {
 			}
 		}
 			
+	   else if (input == "E") {
+			if (selectedList == null) { println("Please select a List first.") }
+			else {
+				println("Old name: ${selectedList!!.name}")
+				var newName: String = readLine().toString()
+				if (newName.isEmpty()) { getPrompt() }
+				else {
+					val condition: PultusORMCondition = PultusORMCondition.Builder()
+				            .eq("listId", selectedList!!.listId)
+				            .build()
+							
+					val updater: PultusORMUpdater = PultusORMUpdater.Builder()
+					            .set("name", newName)
+					            .condition(condition)
+					            .build()
+					
+					pultusORM.update(TodoList(), updater)
+					todolist.loadLists()
+					selectedList!!.name = newName
+					todolist.getLists()
+				}
+			}
+		}
+			
 		else if (input == "DD") {
 			if (selectedList == null) { println("Please select a List first.") }
 			else {
