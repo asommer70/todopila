@@ -5,10 +5,13 @@ import ninja.sakib.pultusorm.core.PultusORMUpdater
 import ninja.sakib.pultusorm.core.PultusORMCondition
 import ninja.sakib.pultusorm.core.PultusORMQuery
 import org.joda.time.DateTime
+import java.util.Date;
+import org.ocpsoft.prettytime.PrettyTime;
 
 val version = "0.0.1"
 val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.todopila/db")
 
+val CLEAR = "\u001Bc"
 val GREEN = "\u001B[32m"
 val MAGENTA = "\u001B[35m"
 val RESET = "\u001B[0m"
@@ -135,6 +138,10 @@ fun main(args: Array<String>) {
 			
 		}
 			
+	    else if (input == "c") {
+			print(CLEAR)
+			getPrompt()
+		}
 			
 		else {
 			println("Sorry, I don't recognize that command.")
@@ -175,6 +182,11 @@ fun printCommands() {
 	println("\t-[\$NUMBER] to mark Item as not done.")
 	println("\tD[\$NUMBER] to archive Item.")
 	println()
+	
+	println("Global Actions:")
+	println("\tc clear the screen.")
+	println("\tS sync to URL.")
+	println("\tSA configure the Sync URL.")
 	getPrompt()
 }
 
@@ -191,8 +203,9 @@ fun printItems() {
 	    val item = it as Item
 		var done = " "
 		if (item.status) done = "\u2713"
-		var createdAt = DateTime(item.createdAt.toLong() * 1000L);
-		val created = "${createdAt.monthOfYear().getAsText()} ${createdAt.getDayOfMonth()}, ${createdAt.getYear()}"
+		var createdAt = Date(item.createdAt.toLong() * 1000L);
+//		val created = "${createdAt.monthOfYear().getAsText()} ${createdAt.getDayOfMonth()}, ${createdAt.getYear()}"
+		val created = PrettyTime().format(createdAt)
 	    println("\t${idx} ($created) [$done]\t${item.content}")
 	}
 	println()
