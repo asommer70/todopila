@@ -50,19 +50,17 @@ class TodoList {
 	}
 	
 	fun selectList(idx: Int): TodoList {
-//		this.selected = this.all[idx]
-//		this.selected = this.all[idx] as TodoList
-//		val name = this.selected
-//		val name = this.all[idx].name
-//		println("Selected ${this.selected.name}.")
 		return this.all[idx] as TodoList
 	}
 	
-	fun getItems(listId: String): MutableList<Any> {
+	fun getItems(listId: String, archives: Boolean = false): MutableList<Any> {
+		var archived = 0
+		if (archives != false) archived = 1
+		
 		val condition: PultusORMCondition = PultusORMCondition.Builder()
             .eq("listId", listId)
             .and()
-			.eq("archive", 0)
+			.eq("archive", archived)
             .sort("createdAt", PultusORMQuery.Sort.ASCENDING)
             .build()
 		

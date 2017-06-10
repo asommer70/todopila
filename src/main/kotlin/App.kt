@@ -92,7 +92,7 @@ fun main(args: Array<String>) {
 		{
 			var item = listItems[input.removeRange(0, 1).toInt()] as Item
 			
-			var updateValue: Any = ""
+			var updateValue: Any = 1
 			var updateField = "status"
 
 			if (input.first().toString() == "-") updateValue = 0
@@ -109,12 +109,14 @@ fun main(args: Array<String>) {
 			
 			val condition: PultusORMCondition = PultusORMCondition.Builder()
 			            .eq("itemId", item.itemId)
-			            .eq("updatedAt", (System.currentTimeMillis() / 1000).toString())
 			            .build()
+			
+			println(condition.rawQuery())
 			
 			val updater: PultusORMUpdater = PultusORMUpdater.Builder()
 			            .set(updateField, updateValue)
-			            .condition(condition)   // condition is optional
+			            .set("updatedAt", (System.currentTimeMillis() / 1000).toString())
+			            .condition(condition)
 			            .build()
 			
 			pultusORM.update(Item(), updater)
@@ -123,6 +125,16 @@ fun main(args: Array<String>) {
 			listItems = todolist.getItems(selectedList!!.listId.toString())
 			printItems()
 		}
+			
+	    else if (input == "lx") {
+			if (selectedList != null) {
+				println("Archived Items in ${selectedList!!.name}:")
+				listItems = todolist.getItems(selectedList!!.listId.toString(), true)
+				printItems()
+			} else { println("Please select a ToDo List first.") }
+			
+		}
+			
 			
 		else {
 			println("Sorry, I don't recognize that command.")
