@@ -20,7 +20,14 @@ class TodoList {
 	@Ignore
 	public var selected: Any? = null
 	
-	fun loadLists() { this.all = pultusORM.find(TodoList()) }
+	fun loadLists() {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+			.eq("archive", 0)
+            .sort("createdAt", PultusORMQuery.Sort.ASCENDING)
+            .build()
+		
+		this.all = pultusORM.find(TodoList(), condition)
+	}
 	
     fun getLists() {
 		println("ToDo Lists:")
@@ -35,18 +42,12 @@ class TodoList {
 	    getPrompt()
 	}
 	
-	fun createList() {
-		//	val daily: TodoList = TodoList()
-		//	daily.name = "Daily"
-		//	daily.userId = "0"
-		//	daily.createdAt = (System.currentTimeMillis() / 1000).toString()
-		//	pultusORM.save(daily)
-		//	val pila: TodoList = TodoList()
-		//	pila.name = "ToDo Pila"
-		//	pila.userId = "0"
-		//	pila.createdAt = (System.currentTimeMillis() / 1000).toString()
-		//	pultusORM.save(pila)
-		//	pultusORM.close()
+	fun create(name: String) {
+		val newList: TodoList = TodoList()
+		newList.name = name
+		newList.userId = "0"
+		newList.createdAt = (System.currentTimeMillis() / 1000).toString()
+		pultusORM.save(newList)
 	}
 	
 	fun selectList(idx: Int): TodoList {

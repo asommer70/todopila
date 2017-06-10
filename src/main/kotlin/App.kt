@@ -4,7 +4,6 @@ import ninja.sakib.pultusorm.core.PultusORM
 import ninja.sakib.pultusorm.core.PultusORMUpdater
 import ninja.sakib.pultusorm.core.PultusORMCondition
 import ninja.sakib.pultusorm.core.PultusORMQuery
-import org.joda.time.DateTime
 import java.util.Date;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -69,6 +68,38 @@ fun main(args: Array<String>) {
 			println("Selected List: ${selectedList!!.name}")
 			getPrompt()
 		}
+			
+		else if (input == "A") {
+			println("Enter a name for the new List:")
+			var name: String = readLine().toString()
+			if (name.isEmpty()) { getPrompt() }
+			else {
+				TodoList().create(name)
+			
+				println("List $name created.")
+				todolist.loadLists()
+				selectedList = todolist.selectList(todolist.all.size - 1)
+				todolist.getLists()
+			}
+		}
+			
+		else if (input == "DD") {
+			if (selectedList == null) { println("Please select a List first.") }
+			else {
+				val condition: PultusORMCondition = PultusORMCondition.Builder()
+			            .eq("listId", selectedList!!.listId)
+			            .build()
+						
+				val updater: PultusORMUpdater = PultusORMUpdater.Builder()
+				            .set("archive", 1)
+				            .condition(condition)
+				            .build()
+								
+				pultusORM.update(TodoList(), updater)
+				todolist.loadLists()
+				todolist.getLists()
+			}
+		}
 		
 		else if (input == "a") {
 			println("Add Item to ${selectedList!!.name}:")
@@ -77,7 +108,8 @@ fun main(args: Array<String>) {
 			
 			println("Items in ${selectedList!!.name}:")
 			listItems = todolist.getItems(selectedList!!.listId.toString())
-			printItems()		}
+			printItems()
+		}
 			
 	    else if (input == "l") {
 			if (selectedList != null) {
@@ -113,9 +145,7 @@ fun main(args: Array<String>) {
 			val condition: PultusORMCondition = PultusORMCondition.Builder()
 			            .eq("itemId", item.itemId)
 			            .build()
-			
-			println(condition.rawQuery())
-			
+						
 			val updater: PultusORMUpdater = PultusORMUpdater.Builder()
 			            .set(updateField, updateValue)
 			            .set("updatedAt", (System.currentTimeMillis() / 1000).toString())
@@ -204,7 +234,6 @@ fun printItems() {
 		var done = " "
 		if (item.status) done = "\u2713"
 		var createdAt = Date(item.createdAt.toLong() * 1000L);
-//		val created = "${createdAt.monthOfYear().getAsText()} ${createdAt.getDayOfMonth()}, ${createdAt.getYear()}"
 		val created = PrettyTime().format(createdAt)
 	    println("\t${idx} ($created) [$done]\t${item.content}")
 	}
