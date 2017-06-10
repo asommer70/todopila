@@ -39,13 +39,16 @@ fun main(args: Array<String>) {
 		    }
 		}	
 	}
+	
+	// Add client Settings.
+	Settings().createClientSettings()
 			
 	// Print welcome message.
 	println("Welcome to ToDo Pila!")
 	println("press h, or ?, for a list of commands.")
 	println()
 	getPrompt()
-	
+		
 	// Setup variables.
 	val todolist = TodoList()
 	todolist.loadLists()
@@ -216,9 +219,9 @@ fun main(args: Array<String>) {
 			for (it in settings) {
 				val setting = it as Settings
 				println("\t[${setting.id}] ${setting.key}: ${setting.value}")
-				println()
-				getPrompt()
 			}
+			println()
+			getPrompt()
 		}
 			
 		else {

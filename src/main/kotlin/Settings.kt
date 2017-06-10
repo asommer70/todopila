@@ -16,14 +16,16 @@ class Settings {
     var createdAt = ""
 	var updatedAt = ""
 
-	fun create(key: String, value: String) {
+	fun create(key: String, value: String, print: Boolean = true) {
     	val setting: Settings = Settings()
 		setting.key = key
 		setting.value = value
 		setting.createdAt = (System.currentTimeMillis() / 1000).toString()
 		setting.updatedAt = (System.currentTimeMillis() / 1000).toString()
 		pultusORM.save(setting)
-		println("Settings saved.")
+		if (print == true) {
+			println("Settings saved.")
+		}
 	}
 	
 	fun isUrlSet(): Boolean {
@@ -51,4 +53,39 @@ class Settings {
 		pultusORM.update(Settings(), updater)
 		println("Sync URL updated.")
 	}
+	
+	fun clientIsSet(): Boolean {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+			.eq("key", "client")
+            .build()
+		
+		val settings = pultusORM.find(Settings(), condition)
+		if (settings.size == 1) {
+			return true
+		}
+		return false
+	}
+	
+	fun createClientSettings() {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+			.eq("key", "client")
+            .build()
+		
+		val settings = pultusORM.find(Settings(), condition)
+		if (settings.size == 0) {
+			// Gather information about the client machine.
+			val hostname = java.net.InetAddress.getLocalHost().getHostName().split(".")[0]
+			val ip = java.net.InetAddress.getLocalHost().hostAddress
+			val user = System.getenv("USER")
+			this.create("client", """
+{
+  "hostname": "$hostname",
+  "ip": "$ip",
+  "user": "$user",
+  "type:" "CLI"
+}""", false)
+		}
+	}
+	
+	
 }
