@@ -197,6 +197,30 @@ fun main(args: Array<String>) {
 			getPrompt()
 		}
 			
+		else if (input == "SA") {
+			println("Set Sync URL:")
+			var url: String = readLine().toString()
+			if (Settings().isUrlSet()) {
+				println("URL is set...")
+				Settings().updateUrl(url)
+			} else {
+				Settings().create("url", url)
+			}
+			
+			getPrompt()
+		}
+			
+		else if (input == "PS") {
+			println("Settings:")
+			var settings = pultusORM.find(Settings())
+			for (it in settings) {
+				val setting = it as Settings
+				println("\t[${setting.id}] ${setting.key}: ${setting.value}")
+				println()
+				getPrompt()
+			}
+		}
+			
 		else {
 			println("Sorry, I don't recognize that command.")
 			getPrompt()
@@ -225,7 +249,7 @@ fun printCommands() {
 	println("\tA to add a new ToDo List.")
 	println("\tL[\$NUMBER] to select a ToDo List.")
 	println ("\ta to add an Item to the selected ToDo List.")
-	println("\tE[\$NUMBER] to edit the selected ToDo List.")
+	println("\tE to edit the selected ToDo List.")
     println("\tDD to archive the selected ToDo List.")
 	println()
 	
@@ -241,6 +265,7 @@ fun printCommands() {
 	println("\tc clear the screen.")
 	println("\tS sync to URL.")
 	println("\tSA configure the Sync URL.")
+	println("\tPS print Settings.")
 	getPrompt()
 }
 
