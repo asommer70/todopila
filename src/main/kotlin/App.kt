@@ -1,5 +1,8 @@
 package todopila
 
+import java.util.Date;
+import java.io.File
+import java.io.Reader
 import ninja.sakib.pultusorm.core.PultusORM
 import ninja.sakib.pultusorm.core.PultusORMUpdater
 import ninja.sakib.pultusorm.core.PultusORMCondition
@@ -7,11 +10,16 @@ import ninja.sakib.pultusorm.core.PultusORMQuery
 import ninja.sakib.pultusorm.exceptions.PultusORMException
 import ninja.sakib.pultusorm.callbacks.Callback
 import ninja.sakib.pultusorm.core.log
-import java.util.Date;
 import org.ocpsoft.prettytime.PrettyTime;
+import com.github.kittinunf.fuel.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 
 val version = "0.0.1"
-val pultusORM: PultusORM = PultusORM("todopila.db", System.getenv("HOME") + "/.todopila/db")
+val dbPath = System.getenv("HOME") + "/.todopila/db"
+val pultusORM: PultusORM = PultusORM("todopila.db", dbPath)
 
 val CLEAR = "\u001Bc"
 val GREEN = "\u001B[32m"
@@ -299,6 +307,28 @@ fun main(args: Array<String>) {
 					println()
 					getPrompt()
 				}
+			}
+		}
+			
+		else if (input == "S") {
+			val url = Settings().getSyncUrl()
+			if (url.isEmpty()) {
+				println("Sync URL is not set, please set it before attempting sync.")
+				getPrompt()
+			} else {
+
+				Fuel.upload(url, parameters = listOf("client" to "cli-linux"))
+					.source { request, url ->
+			            File(dbPath, "todopila.db")
+			        }
+//					.progress { writtenBytes, totalBytes ->
+//			            println("${writtenBytes.toFloat() / totalBytes.toFloat()}")
+//			        }
+					.responseString { request, response, result ->
+			            println("result: ${result}")
+						println()
+						getPrompt()
+			        }
 			}
 		}
 			

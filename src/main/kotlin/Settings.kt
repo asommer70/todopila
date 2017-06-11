@@ -40,6 +40,19 @@ class Settings {
 		return false
 	}
 	
+	fun getSyncUrl(): String {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+			.eq("key", "url")
+            .build()
+		
+		val url = pultusORM.find(Settings(), condition)
+		if (url.size == 1) {
+			return (url[0] as Settings).value
+		}
+		return ""
+	}
+	
+	
 	fun updateUrl(url: String) {
 		val condition: PultusORMCondition = PultusORMCondition.Builder()
 	        .eq("key", "url")
