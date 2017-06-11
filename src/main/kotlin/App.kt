@@ -4,6 +4,9 @@ import ninja.sakib.pultusorm.core.PultusORM
 import ninja.sakib.pultusorm.core.PultusORMUpdater
 import ninja.sakib.pultusorm.core.PultusORMCondition
 import ninja.sakib.pultusorm.core.PultusORMQuery
+import ninja.sakib.pultusorm.exceptions.PultusORMException
+import ninja.sakib.pultusorm.callbacks.Callback
+import ninja.sakib.pultusorm.core.log
 import java.util.Date;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -283,18 +286,15 @@ fun main(args: Array<String>) {
 				            .build()
 							
 					val updater: PultusORMUpdater = PultusORMUpdater.Builder()
-					            .set("fisrtName", inputs[0].trim())
+					            .set("firstName", inputs[0].trim())
 							    .set("lastName", inputs[1].trim())
 					            .set("email", inputs[2].trim().toLowerCase())
 					            .set("gravatarUrl", User().getGravatarUrl(inputs[2].toLowerCase().trim()))
 					            .set("updatedAt", (System.currentTimeMillis() / 1000).toString())
 					            .condition(condition)
 					            .build()
-					
-					println(condition.rawQuery())
-					println(updater.updateQuery())
 									
-					pultusORM.update(User(), updater)
+					pultusORM.update(User(), updater, ResponseCallback())
 					println("User updated.")
 					println()
 					getPrompt()
@@ -372,4 +372,15 @@ fun printItems() {
 	}
 	println()
 	getPrompt()
+}
+
+class ResponseCallback : Callback {
+    override fun onSuccess(type: PultusORMQuery.Type) {
+        log("${type.name}", "Success")
+    }
+
+    override fun onFailure(type: PultusORMQuery.Type, exception: PultusORMException) {
+        log("${type.name}", "Failure")
+        exception.printStackTrace()
+    }
 }
