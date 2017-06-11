@@ -224,6 +224,84 @@ fun main(args: Array<String>) {
 			getPrompt()
 		}
 			
+		else if (input == "PU") {
+			println("User:")
+			val users = pultusORM.find(User())
+			for (it in users) {
+				val user = it as User
+				var updatedAt = Date(user.updatedAt.toLong() * 1000L);
+				val updated = PrettyTime().format(updatedAt)
+				println("\t[${user.id}] ${user.firstName} ${user.lastName} <${user.email}>, ${user.gravatarUrl}")
+				println("\tLast updated: $updated")
+			}
+			println()
+			getPrompt()
+		}
+			
+		else if (input == "AU") {
+			val foundUser = pultusORM.find(User())
+			if (foundUser.size == 1) {
+				println("User already created.")
+				getPrompt()
+				continue
+			}
+			
+			println("Add User by typing the following fields separated by commas \",\":")
+			println("\tfirstName, lastName, email")
+			
+			var userInput = readLine().toString().split(",")
+			if (userInput.size != 3) {
+				println("User not created.")
+				getPrompt()						
+			} else {
+				User().create(userInput[0].trim(), userInput[1].trim(), userInput[2].toLowerCase().trim())
+	
+				println()
+				getPrompt()
+			}
+		}
+			
+		else if (input == "EU") {
+			val foundUser = pultusORM.find(User())
+			if (foundUser.size != 1) {
+				println("User not created, please use AU to add a user first.")
+				getPrompt()
+			}
+			else {
+				println("Update User by typing the following fields separated by commas \",\":")
+				println("firstName, lastName, email")
+			
+				var userInput = readLine().toString()
+				var inputs = userInput.split(",")
+				if (userInput.isEmpty() || inputs.size != 3) {
+					println("User not udpated.")
+					getPrompt()						
+				} else {
+					
+					val condition: PultusORMCondition = PultusORMCondition.Builder()
+				            .eq("id", (foundUser[0] as User).id)
+				            .build()
+							
+					val updater: PultusORMUpdater = PultusORMUpdater.Builder()
+					            .set("fisrtName", inputs[0].trim())
+							    .set("lastName", inputs[1].trim())
+					            .set("email", inputs[2].trim().toLowerCase())
+					            .set("gravatarUrl", User().getGravatarUrl(inputs[2].toLowerCase().trim()))
+					            .set("updatedAt", (System.currentTimeMillis() / 1000).toString())
+					            .condition(condition)
+					            .build()
+					
+					println(condition.rawQuery())
+					println(updater.updateQuery())
+									
+					pultusORM.update(User(), updater)
+					println("User updated.")
+					println()
+					getPrompt()
+				}
+			}
+		}
+			
 		else {
 			println("Sorry, I don't recognize that command.")
 			getPrompt()
@@ -269,6 +347,9 @@ fun printCommands() {
 	println("\tS sync to URL.")
 	println("\tSA configure the Sync URL.")
 	println("\tPS print Settings.")
+	println("\tPU print User.")
+	println("\tAU add User.")
+	println("\tEU edit User.")
 	getPrompt()
 }
 
