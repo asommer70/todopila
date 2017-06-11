@@ -316,14 +316,11 @@ fun main(args: Array<String>) {
 				println("Sync URL is not set, please set it before attempting sync.")
 				getPrompt()
 			} else {
-
-				Fuel.upload(url, parameters = listOf("client" to "cli-linux"))
+				val clientName = Settings().getClient()
+				Fuel.upload(url + "?client=$clientName", parameters = listOf("client" to clientName))
 					.source { request, url ->
 			            File(dbPath, "todopila.db")
 			        }
-//					.progress { writtenBytes, totalBytes ->
-//			            println("${writtenBytes.toFloat() / totalBytes.toFloat()}")
-//			        }
 					.responseString { request, response, result ->
 			            println("result: ${result}")
 						println()

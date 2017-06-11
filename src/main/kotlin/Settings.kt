@@ -52,6 +52,18 @@ class Settings {
 		return ""
 	}
 	
+	fun getClient(): String {
+		val condition: PultusORMCondition = PultusORMCondition.Builder()
+			.eq("key", "client")
+            .build()
+		
+		val client = pultusORM.find(Settings(), condition)
+		if (client.size == 1) {
+			val parts = (client[0] as Settings).value.split(",")
+			return parts[0] + "-" + parts[3]
+		}
+		return ""
+	}
 	
 	fun updateUrl(url: String) {
 		val condition: PultusORMCondition = PultusORMCondition.Builder()
@@ -90,13 +102,7 @@ class Settings {
 			val hostname = java.net.InetAddress.getLocalHost().getHostName().split(".")[0]
 			val ip = java.net.InetAddress.getLocalHost().hostAddress
 			val user = System.getenv("USER")
-			this.create("client", """
-{
-  "hostname": "$hostname",
-  "ip": "$ip",
-  "user": "$user",
-  "type:" "CLI"
-}""", false)
+			this.create("client", "$hostname,$ip,$user,cli", false)
 		}
 	}
 	
